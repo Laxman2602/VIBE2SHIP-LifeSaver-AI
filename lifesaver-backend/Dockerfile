@@ -1,20 +1,20 @@
-# Use the official .NET SDK image to build the app
+# Stage 1: Build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy the project file and restore dependencies
-COPY *.csproj ./
-RUN dotnet restore
+# Copy everything
+COPY . .
 
-# Copy the remaining files and build the app
-COPY . ./
-RUN dotnet publish -c Release -o /app/publish
+# Explicitly restore the project
+RUN dotnet restore "lifesaver-backend.csproj"
 
-# Use the official .NET runtime image to run the app
+# Build and Publish
+RUN dotnet publish "lifesaver-backend.csproj" -c Release -o /app/publish
+
+# Stage 2: Runtime
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/publish .
 
-# Expose the port (Render handles port 8080/10000 automatically)
-EXPOSE 8080
+# The command to run your app
 ENTRYPOINT ["dotnet", "lifesaver-backend.dll"]
