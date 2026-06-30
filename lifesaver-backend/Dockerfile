@@ -5,13 +5,12 @@ WORKDIR /app
 # Copy the entire repository content into the container
 COPY . .
 
-# Explicitly navigate to the backend folder and build
-# This assumes the Dockerfile is in /lifesaver-backend
+# Explicitly restore and build
 RUN dotnet restore "lifesaver-backend/lifesaver-backend.csproj"
 RUN dotnet publish "lifesaver-backend/lifesaver-backend.csproj" -c Release -o /app/publish
 
-# Stage 2: Runtime
-FROM mcr.microsoft.com/dotnet/aspnet:8.0
+# Stage 2: Runtime (UPDATE THIS LINE)
+FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
 COPY --from=build /app/publish .
 
