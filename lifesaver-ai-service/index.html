@@ -25,10 +25,14 @@
     </div>
 
     <script>
+        // UPDATE THESE URLS AFTER DEPLOYING TO RENDER
+        const BACKEND_URL = "http://localhost:5188"; 
+        const GATEWAY_URL = "http://127.0.0.1:8000";
+
         async function fetchTasks() {
             const grid = document.getElementById('task-grid');
             try {
-                const res = await fetch('http://localhost:5188/api/tasks');
+                const res = await fetch(`${BACKEND_URL}/api/tasks`);
                 const tasks = await res.json();
                 
                 if (tasks.length === 0) {
@@ -60,7 +64,7 @@
             btn.disabled = true;
             
             try {
-                const response = await fetch('http://127.0.0.1:8000/api/chat', {
+                const response = await fetch(`${GATEWAY_URL}/api/chat`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ message: "Add a new task: " + input.value })
@@ -71,7 +75,7 @@
                 input.value = "";
                 fetchTasks(); 
             } catch (error) {
-                alert("The AI Agent is temporarily busy (Quota limit). Please try again in 1 minute!");
+                alert("The AI Agent is temporarily busy (Quota limit). Please try again!");
                 console.error(error);
             } finally {
                 btn.innerText = "Add Task";
