@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Life Saver AI Dashboard</title>
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-extrabold text-gray-900 mb-8">Life Saver AI Dashboard</h1>
+        
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8">
+            <h2 class="text-lg font-semibold text-gray-700 mb-4">Add Task via AI</h2>
+            <div class="flex gap-2">
+                <input type="text" id="taskInput" placeholder="e.g., Remind me to call Dad at 6pm..." 
+                       class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                <button id="addBtn" onclick="addTask()" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition">
+                    Add Task
+                </button>
+            </div>
+        </div>
+
+        <div id="task-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <p class="text-gray-500">Loading your tasks...</p>
+        </div>
+    </div>
+
+    <script>
+        async function fetchTasks() {
+            const grid = document.getElementById('task-grid');
+            try {
+                const res = await fetch('http://localhost:5188/api/tasks');
+                const tasks = await res.json();
+                
+                if (tasks.length === 0) {
+                    grid.innerHTML = "<p class='text-gray-500'>No active tasks found.</p>";
+                    return;
+                }
+
+                grid.innerHTML = tasks.map(t => `
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 ${t.priority === 'Urgent' ? 'border-l-red-500' : 'border-l-blue-500'}">
+                        <h3 class="font-bold text-lg text-gray-800">${t.title}</h3>
+                        <p class="text-sm text-gray-600 mt-2">${t.description}</p>
+                        <div class="mt-4 flex justify-between items-center text-sm">
+                            <span class="text-gray-400">Due: ${t.deadline ? t.deadline.split('T')[0] : 'N/A'}</span>
+                            <span class="font-bold ${t.priority === 'Urgent' ? 'text-red-600' : 'text-blue-600'}">${t.priority}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                grid.innerHTML = "<p class='text-red-500'>Error: Could not connect to the database.</p>";
+            }
+        }
+
+        async function addTask() {
+            const input = document.getElementById('taskInput');
+            const btn = document.getElementById('addBtn');
+            if (!input.value) return;
+            
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+            
+            try {
+                const response = await fetch('http://127.0.0.1:8000/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: "Add a new task: " + input.value })
+                });
+                
+                if (!response.ok) throw new Error("AI Agent unreachable.");
+                
+                input.value = "";
+                fetchTasks(); 
+            } catch (error) {
+                alert("The AI Agent is temporarily busy (Quota limit). Please try again in 1 minute!");
+                console.error(error);
+            } finally {
+                btn.innerText = "Add Task";
+                btn.disabled = false;
+            }
+        }
+
+        fetchTasks();
+    </script>
+</body>
+</html>
