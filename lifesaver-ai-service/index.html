@@ -25,9 +25,14 @@
     </div>
 
     <script>
-        // UPDATE THESE URLS AFTER DEPLOYING TO RENDER
-        const BACKEND_URL = "http://localhost:5188"; 
-        const GATEWAY_URL = "http://127.0.0.1:8000";
+        // --- DEPLOYMENT CONFIGURATION ---
+        // 1. Deploy your Backend to Render
+        // 2. Paste the provided URL below (e.g., https://lifesaver-backend.onrender.com)
+        const BACKEND_URL = "https://your-backend-service-name.onrender.com"; 
+        
+        // 3. Deploy your AI Gateway to Render
+        // 4. Paste the provided URL below (e.g., https://lifesaver-gateway.onrender.com)
+        const GATEWAY_URL = "https://your-gateway-service-name.onrender.com";
 
         async function fetchTasks() {
             const grid = document.getElementById('task-grid');
@@ -75,7 +80,7 @@
                 input.value = "";
                 fetchTasks(); 
             } catch (error) {
-                alert("The AI Agent is temporarily busy (Quota limit). Please try again!");
+                alert("The AI Agent is busy or unreachable. Please check your deployment logs.");
                 console.error(error);
             } finally {
                 btn.innerText = "Add Task";

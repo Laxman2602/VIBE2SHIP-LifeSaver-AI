@@ -3,17 +3,22 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from google import genai
 import requests
+import os
 
 app = FastAPI(title="Life Saver AI Gateway")
 
 # 1. Initialize the Google Gen AI Client
-client = genai.Client(api_key="API_KEY")
+# Ensure you set the GEMINI_API_KEY environment variable in Render!
+client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))
+
+# Use the environment variable for the C# backend URL
+C_SHARP_BACKEND_URL = os.environ.get("BACKEND_URL", "http://localhost:5188")
 
 # --- THE TOOLS ---
 def get_my_tasks():
     """Gets the user's current tasks from the database."""
     try:
-        response = requests.get("http://localhost:5188/api/tasks", timeout=5)
+        response = requests.get(f"{C_SHARP_BACKEND_URL}/api/tasks", timeout=5)
         return response.json()
     except Exception as e:
         print(f"DEBUG: Error fetching tasks: {e}")
@@ -21,7 +26,6 @@ def get_my_tasks():
 
 def add_new_task(title: str, description: str, deadline: str, priority: str, estimatedMinutes: int):
     """Creates a new task in the database."""
-    # Ensure ISO format for C#
     if "T" not in deadline:
         deadline = f"{deadline}T09:00:00"
     
@@ -34,7 +38,7 @@ def add_new_task(title: str, description: str, deadline: str, priority: str, est
     }
     
     try:
-        response = requests.post("http://localhost:5188/api/tasks", json=payload, timeout=5)
+        response = requests.post(f"{C_SHARP_BACKEND_URL}/api/tasks", json=payload, timeout=5)
         print(f"DEBUG: C# Server Responded with {response.status_code}")
         return {"status": "success"}
     except Exception as e:
