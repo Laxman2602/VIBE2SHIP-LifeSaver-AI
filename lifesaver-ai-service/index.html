@@ -26,13 +26,11 @@
 
     <script>
         // --- DEPLOYMENT CONFIGURATION ---
-        // 1. Deploy your Backend to Render
-        // 2. Paste the provided URL below (e.g., https://lifesaver-backend.onrender.com)
+        // 1. Update BACKEND_URL once your C# backend is live on Render
         const BACKEND_URL = "https://your-backend-service-name.onrender.com"; 
         
-        // 3. Deploy your AI Gateway to Render
-        // 4. Paste the provided URL below (e.g., https://lifesaver-gateway.onrender.com)
-        const GATEWAY_URL = "https://your-gateway-service-name.onrender.com";
+        // 2. AI Gateway is now live
+        const GATEWAY_URL = "https://vibe2ship-lifesaver-ai.onrender.com";
 
         async function fetchTasks() {
             const grid = document.getElementById('task-grid');
@@ -56,7 +54,7 @@
                     </div>
                 `).join('');
             } catch (error) {
-                grid.innerHTML = "<p class='text-red-500'>Error: Could not connect to the database.</p>";
+                grid.innerHTML = "<p class='text-red-500'>Error: Could not connect to the database. Please ensure Backend URL is updated.</p>";
             }
         }
 
